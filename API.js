@@ -1,45 +1,38 @@
 $(document).ready(function(){$(".content").hide();});
 
-loadPandaPoolData();
-loadExchanges();
-loadAddress();
+init();
 
-function loadAddress()
+function init()
 {
-	$.ajax({
-		url: 'https://chain.so/api/v2/get_address_balance/DOGE/DR8AbNaQNazgn2xKKetQWxUrkG6fMeRA7B',
-		dataType: 'jsonp',
-		success: function(results){
-			$('#addressInfo').html("<div class=\"payouts\">Current Balance: " + results.data.confirmed_balance + " DOGE</div>");
-		}
-	});
-}
+var dogeBTCrate;
+var ltcUSDprice;
+var round;
 
-function loadExchanges()
-{
+
 var url = 'btc-e.com/api/2/ltc_usd/trades';
 url = encodeURIComponent(url);
 url = 'http://jsonp.guffa.com/Proxy.ashx?url=' + url;
 
+//Litecoin-USD Price
 $.ajax({
 url: url,
 dataType: 'jsonp',
 success: function(results){
-	var ltcUSDprice = results[0].price;
+	ltcUSDprice = results[0].price;
 	$('#ltcUSD').html("<span id=\"price\">$" + ltcUSDprice.toFixed(2) + "</span> - LTC/USD");
 	
 }
 });
-	
-var url = 'http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=132';
+
+//Doge-Bitcoin (Cryptsy) & Bitcoin-USD (Coinbase)	
+url = 'http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=132';
 url = encodeURIComponent(url);
 url = 'http://jsonp.guffa.com/Proxy.ashx?url=' + url;
-
 $.ajax({
     url: url,
     dataType: 'jsonp',
     success: function(results){
-    	var dogeBTCrate = results.return.markets.DOGE.lasttradeprice;
+    	dogeBTCrate = results.return.markets.DOGE.lasttradeprice;
     	
 	    var url = 'coinbase.com/api/v1/currencies/exchange_rates';
 		url = encodeURIComponent(url);
@@ -49,7 +42,7 @@ $.ajax({
 	    url: url,
 	    dataType: 'jsonp',
 	    success: function(results){
-	    	var btcUSDprice = results.btc_to_usd;
+	    	btcUSDprice = results.btc_to_usd;
 	    	btcUSDprice = roundToTwo(btcUSDprice);
 	    	$('#btcUSD').html("<span id=\"price\">$" + btcUSDprice + "</span> - BTC/USD");
 	    	
@@ -59,10 +52,17 @@ $.ajax({
 	});
     }	
 });
-}
 
-function loadPandaPoolData()
-{
+//Doge Balance
+$.ajax({
+	url: 'https://chain.so/api/v2/get_address_balance/DOGE/DR8AbNaQNazgn2xKKetQWxUrkG6fMeRA7B',
+	dataType: 'jsonp',
+	success: function(results){
+		$('#addressInfo').html("<div>Current Balance: " + roundToTwo(results.data.confirmed_balance) + " DOGE</div>");
+	}
+});
+
+//PandaPool Hashrate	
 $.ajax({
 url: "http://multi.pandapool.info/api.php?q=hashrate",
 dataType: 'json',
@@ -72,6 +72,7 @@ success: function(results){
 }	
 });
 
+//Miner hashrate and payouts
 $.ajax({
     url: "http://multi.pandapool.info/api.php?q=userinfo&user=DR8AbNaQNazgn2xKKetQWxUrkG6fMeRA7B",
     dataType: 'json',
@@ -84,7 +85,7 @@ $.ajax({
 		{
 			var roundlocal = results.result.history[i].round;
     		var roundpayout = results.result.history[i].payout;
-    		payoutHTML += "<div class=\"payouts\">Round " + roundlocal + ": " + roundpayout + " DOGE</div>"
+    		payoutHTML += "<div class=\"payouts\">Round " + roundlocal + ": " + roundToTwo(roundpayout) + " DOGE</div>"
     		
     		if (i<6)
     		{
@@ -92,9 +93,9 @@ $.ajax({
     		}
 		}
 		
-		payoutHTML += "<p></p><div class=\"payouts\">24 Hour Payout: " + payout24 + " DOGE</div>"
+		$('#pay24').html("<div>Current 24 Hour Payout: " + roundToTwo(payout24) + " DOGE</div>");
 		
-		var round = results.result.history[0].round;
+		round = results.result.history[0].round;
 	    var url2 = 'http://multi.pandapool.info/api.php?q=roundinfo&round=' + round;
 		url2 = encodeURIComponent(url2);
 		url2 = 'http://jsonp.guffa.com/Proxy.ashx?url=' + url2;
@@ -103,7 +104,7 @@ $.ajax({
 	    url: url2,
 	    dataType: 'jsonp',
 	    success: function(results1){
-	    	$('#cash').html("<p></p><div class=\"payouts\">Current MH/s Return: " + roundToTwo(results1.result.doge_mhs_day)+ " DOGE/Day</div>");
+	    	$('#cash').html("<div>Current MH/s Return: " + roundToTwo(results1.result.doge_mhs_day)+ " DOGE/Day</div>");
 	    }
 	 	});
 		
@@ -116,41 +117,26 @@ $.ajax({
     	{
     		minerHTML += "<div><div class=\"default\" id=\"progressBar"+ (i+1) + "\" ><div></div></div><div class=\"minerHash\" id=\"miner" + (i+1) + "Hash\"></div><div class=\"miner\">Miner "+ words[i] +"</div></div>";
     	}
+
     	$('#miners').html(minerHTML);
     	
     	for(var i = 0; i<(results.result.workers.length / 2);i++)
     	{
     		var hash = parseInt(results.result.workers[i][2]) + parseInt(results.result.workers[i+(results.result.workers.length / 2)][2]);
     		
-    		if (hash > 300)
-	    	{
-	    		progressBar(100, $('#progressBar' + (i+1)), hash);
-	    	}
+    		if (hash > 300) {progressBar(100, $('#progressBar' + (i+1)), hash);}
 	    	
-	    	else
-	    	{
-	    		progressBar(((hash/300)*100), $('#progressBar' + (i+1)), hash);
-	    	}
+	    	else {progressBar(((hash/300)*100), $('#progressBar' + (i+1)), hash);}
 	    	
 	    	$('#miner' + (i+1) + 'Hash').html(hash + " KH/S");
     	}
     	
     	var totalHash = 0;
     	
-    	for (var i = 0; i < results.result.workers.length;i++)
-    	{
-    		totalHash = totalHash + parseInt(results.result.workers[i][2]);
-    	}
+    	for (var i = 0; i < results.result.workers.length;i++) {totalHash = totalHash + parseInt(results.result.workers[i][2]);}
     	
-    	if (totalHash > (results.result.workers.length / 2)*300)
-    	{
-    		progressBar(100, $('#progressBar'), totalHash);
-    	}
-    	
-    	else
-    	{
-    		progressBar(((totalHash/((results.result.workers.length / 2)*300))*100), $('#progressBar'), totalHash);
-    	}
+    	if (totalHash > (results.result.workers.length / 2)*300){progressBar(100, $('#progressBar'), totalHash);}
+    	else {progressBar(((totalHash/((results.result.workers.length / 2)*300))*100), $('#progressBar'), totalHash);}
     	
     	$('#totalHash').html(totalHash + " KH/S");	  
     }

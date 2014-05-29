@@ -72,6 +72,10 @@ body{
 	margin-left:10px;
 }
 
+#infoHeader{
+	font-size:28px;
+}
+
 #ltcUSD{
 	color:#C0C4C5;
 	padding:0;
@@ -102,4 +106,13 @@ body{
 	margin-top:5px;
 	margin-bottom:15px;
 	margin-left:10px;
+}
+
+#statsInfo{
+	position: relative;
+	left: 800px;
+	top:-225px;
+	padding:0;
+	border-style:none;
+	width:30%;
 }
