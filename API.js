@@ -1,88 +1,115 @@
-$(document).ready(function() {
-	
+$(document).ready(function(){$(".content").hide();});
+
 loadPandaPoolData();
-loadPandaPoolHash();
-loadCryptsy();
-loadCoinbase();
-loadLTC();
+loadExchanges();
+loadAddress();
 
-function loadLTC()
+function loadAddress()
 {
-	var url = 'btc-e.com/api/2/ltc_usd/trades';
-	url = encodeURIComponent(url);
-	url = 'http://jsonp.guffa.com/Proxy.ashx?url=' + url;
-
 	$.ajax({
-    url: url,
-    dataType: 'jsonp',
-    success: function(results){
-    	var ltcUSDprice = results[0].price;
-
-    	$('#ltcUSD').html("<span id=\"price\">$" + ltcUSDprice.toFixed(2) + "</span> - LTC/USD");
-    	
-    }
- 	});
+		url: 'https://chain.so/api/v2/get_address_balance/DOGE/DR8AbNaQNazgn2xKKetQWxUrkG6fMeRA7B',
+		dataType: 'jsonp',
+		success: function(results){
+			$('#addressInfo').html("<div class=\"payouts\">Current Balance: " + results.data.confirmed_balance + " DOGE</div>");
+		}
+	});
 }
 
-
-
-function loadCoinbase()
+function loadExchanges()
 {
-	var url = 'coinbase.com/api/v1/currencies/exchange_rates';
-	url = encodeURIComponent(url);
-	url = 'http://jsonp.guffa.com/Proxy.ashx?url=' + url;
+var url = 'btc-e.com/api/2/ltc_usd/trades';
+url = encodeURIComponent(url);
+url = 'http://jsonp.guffa.com/Proxy.ashx?url=' + url;
 
-	$.ajax({
-    url: url,
-    dataType: 'jsonp',
-    success: function(results){
-    	var btcUSDprice = results.btc_to_usd;
-    	btcUSDprice = roundToTwo(btcUSDprice);
-    	$('#btcUSD').html("<span id=\"price\">$" + btcUSDprice + "</span> - BTC/USD");
-    }	
+$.ajax({
+url: url,
+dataType: 'jsonp',
+success: function(results){
+	var ltcUSDprice = results[0].price;
+	$('#ltcUSD').html("<span id=\"price\">$" + ltcUSDprice.toFixed(2) + "</span> - LTC/USD");
+	
+}
 });
-}
-
-
-function loadCryptsy()
-{
+	
 var url = 'http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=132';
 url = encodeURIComponent(url);
 url = 'http://jsonp.guffa.com/Proxy.ashx?url=' + url;
-	
+
 $.ajax({
     url: url,
     dataType: 'jsonp',
     success: function(results){
     	var dogeBTCrate = results.return.markets.DOGE.lasttradeprice;
     	
-    	$('#dogeBTC').html("<span id=\"price\">" + Math.ceil(dogeBTCrate*100000000) + "</span> Satoshi - DOGE/BTC");
-    }	
-});
-}
-
-function loadPandaPoolHash()
-{
+	    var url = 'coinbase.com/api/v1/currencies/exchange_rates';
+		url = encodeURIComponent(url);
+		url = 'http://jsonp.guffa.com/Proxy.ashx?url=' + url;
 	
-$.ajax({
-    url: "http://multi.pandapool.info/api.php?q=hashrate",
-    dataType: 'json',
-    success: function(results){
-    	var poolHash = results.result[47][1];
-    	$('#poolHash').html("Pandapool Hashrate: " + poolHash/1000 + " MH/S");
+		$.ajax({
+	    url: url,
+	    dataType: 'jsonp',
+	    success: function(results){
+	    	var btcUSDprice = results.btc_to_usd;
+	    	btcUSDprice = roundToTwo(btcUSDprice);
+	    	$('#btcUSD').html("<span id=\"price\">$" + btcUSDprice + "</span> - BTC/USD");
+	    	
+	    	var dogeThousand = dogeBTCrate * 1000 * btcUSDprice;
+	    	$('#dogeBTC').html("<div><span id=\"price\">" + Math.ceil(dogeBTCrate*100000000) + "</span> Satoshi - DOGE/BTC<span><span id=\"price\"> $" + roundToThree(dogeThousand) + "</span> - 1000 DOGE/USD </span></div>");
+	    }	
+	});
     }	
 });
 }
 
 function loadPandaPoolData()
 {
+$.ajax({
+url: "http://multi.pandapool.info/api.php?q=hashrate",
+dataType: 'json',
+success: function(results){
+	var poolHash = results.result[47][1];
+	$('#poolHash').html("Pandapool Hashrate: " + poolHash/1000 + " MH/S");
+}	
+});
 
 $.ajax({
     url: "http://multi.pandapool.info/api.php?q=userinfo&user=DR8AbNaQNazgn2xKKetQWxUrkG6fMeRA7B",
     dataType: 'json',
     success: function(results){
     	
-    	var minerHTML = "<div><div class=\"default\" id=\"progressBar\" ><div></div></div><div class=\"minerHash\" id=\"totalHash\"></div><div class=\"miner\">Total Hashrate</div></div>";
+    	var payoutHTML = "<div id=\"payoutsHeader\">Payouts</div>";
+		var payout24 = 0;
+		
+		for(i=0;i<10;i++)
+		{
+			var roundlocal = results.result.history[i].round;
+    		var roundpayout = results.result.history[i].payout;
+    		payoutHTML += "<div class=\"payouts\">Round " + roundlocal + ": " + roundpayout + " DOGE</div>"
+    		
+    		if (i<6)
+    		{
+    			payout24 += roundpayout;
+    		}
+		}
+		
+		payoutHTML += "<p></p><div class=\"payouts\">24 Hour Payout: " + payout24 + " DOGE</div>"
+		
+		var round = results.result.history[0].round;
+	    var url2 = 'http://multi.pandapool.info/api.php?q=roundinfo&round=' + round;
+		url2 = encodeURIComponent(url2);
+		url2 = 'http://jsonp.guffa.com/Proxy.ashx?url=' + url2;
+	
+		$.ajax({
+	    url: url2,
+	    dataType: 'jsonp',
+	    success: function(results1){
+	    	$('#cash').html("<p></p><div class=\"payouts\">Current MH/s Return: " + roundToTwo(results1.result.doge_mhs_day)+ " DOGE/Day</div>");
+	    }
+	 	});
+		
+		$('#payouts').html(payoutHTML);
+    	
+		minerHTML = "<div><div class=\"default\" id=\"progressBar\" ><div></div></div><div class=\"minerHash\" id=\"totalHash\"></div><div class=\"miner\">Total Hashrate</div></div>";
     	var words = ["One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen","Twenty"];
     	
     	for(var i = 0; i<(results.result.workers.length / 2);i++)
@@ -125,26 +152,7 @@ $.ajax({
     		progressBar(((totalHash/((results.result.workers.length / 2)*300))*100), $('#progressBar'), totalHash);
     	}
     	
-    	$('#totalHash').html(totalHash + " KH/S");
-		
-		var payoutHTML = "<div id=\"payoutsHeader\">Payouts</div>";
-		var payout24 = 0;
-		
-		for(i=0;i<10;i++)
-		{
-			var round = results.result.history[i].round;
-    		var roundpayout = results.result.history[i].payout;
-    		payoutHTML += "<div class=\"payouts\">Round " + round+ ": " + roundpayout + " DOGE</div>"
-    		
-    		if (i<6)
-    		{
-    			payout24 += roundpayout;
-    		}
-		}
-		
-		payoutHTML += "<p></p><div class=\"payouts\">24 Hour Payout: " + payout24 + " DOGE</div>"
-		
-		$('#payouts').html(payoutHTML);  
+    	$('#totalHash').html(totalHash + " KH/S");	  
     }
 });
 
@@ -153,8 +161,13 @@ function progressBar(percent, $element, miner) {
 			$element.find('div').animate({ width: progressBarWidth }, 500).html();
 		}
 }
-});
 
 function roundToTwo(num) {    
     return +(Math.round(num + "e+2")  + "e-2");
 }
+
+function roundToThree(num) {    
+    return +(Math.round(num + "e+3")  + "e-3");
+}
+
+$(window).load(function(){$(".loading").fadeOut("slow", function(){$(".content").fadeIn("slow");});});
