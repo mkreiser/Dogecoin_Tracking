@@ -27,6 +27,19 @@ body{
 	background: -o-linear-gradient(top, #0099FF, #1a82f7);
 }
 
+.headerTwo{
+	font-size: 28px;
+}
+
+.headerThree{
+	font-size: 28px;
+	text-decoration: underline;
+}
+
+.infoSection{
+	margin-top: 3px;
+}
+
 .miner{
 	font-size: 28px;
 	margin-top:5px;
@@ -41,29 +54,21 @@ body{
 }
 
 .payouts{
-	position:relative;
-	left:600px;
-	width:30%;
 	margin-top:3px;
 }
 
 #btcUSD{
 	color:#F7931A;
-	padding:0;
-	border-style:none;
+	position:absolute;
+	left:600px;
+	top:575px;
 }
 
 #dogeBTC{
 	color:#BA9F33;
-	padding:0;
-	border-style:none;
-}
-
-#exchanges{
-	margin-top:25px;
-	position:relative;
+	position:absolute;
 	left:600px;
-	width:60%;
+	top:375px;
 }
 
 #header{
@@ -72,14 +77,11 @@ body{
 	margin-left:10px;
 }
 
-#infoHeader{
-	font-size:28px;
-}
-
 #ltcUSD{
 	color:#C0C4C5;
-	padding:0;
-	border-style:none;
+	position:absolute;
+	left:600px;
+	top:700px;
 }
 
 #miners{
@@ -88,9 +90,8 @@ body{
 	margin-left:10px;
 }
 
-#payoutsHeader{
-	font-size:28px;
-	position:relative;
+#payouts{
+	position:absolute;
 	left:600px;
 	width:30%;
 }
@@ -102,17 +103,13 @@ body{
 #poolHash{
 	position:absolute;
 	top:90px;
-	font-size: 28px;
 	margin-top:5px;
 	margin-bottom:15px;
 	margin-left:10px;
 }
 
 #statsInfo{
-	position: relative;
+	position: absolute;
 	left: 800px;
-	top:-225px;
-	padding:0;
-	border-style:none;
 	width:30%;
 }
