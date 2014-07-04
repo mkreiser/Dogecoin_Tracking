@@ -36,10 +36,25 @@ body{
 	text-decoration: underline;
 }
 
+.infoSection{
+	margin-top: 3px;
+}
+
 .miner{
 	font-size: 28px;
 	margin-top:5px;
-	margin-bottom:3px;
+	margin-bottom:15px;
+}
+
+.minerHash{
+	font-size:25px;
+	position:relative;
+	margin-top:-32px;
+	left:415px;
+}
+
+.payouts{
+	margin-top:3px;
 }
 
 .smallFont{
@@ -49,29 +64,16 @@ body{
 #btcUSD{
 	color:#F7931A;
 	position:absolute;
-	left:400px;
-	top:425px;
-}
-
-#btcWallet{
-	color:#F7931A;
-	position:absolute;
-	left:400px;
-	top:200px;
+	left:600px;
+	top:675px;
 }
 
 #dogeBTC{
 	color:#BA9F33;
 	position:absolute;
-	left:10px;
-	top:425px;
-}
-
-#dogeWallet{
-	color:#BA9F33;
-	position:absolute;
-	left:10px;
-	top:200px;
+	left:1000px;
+	top:475px;
+	min-width: 300px;
 }
 
 #header{
@@ -83,24 +85,45 @@ body{
 #ltcUSD{
 	color:#C0C4C5;
 	position:absolute;
-	left:875px;
-	top:425px;
+	left:1000px;
+	top:675px;
 	min-width: 300px;
 }
 
 #miners{
 	position: absolute;
-	top: 100px;
+	top: 150px;
 	margin-left:10px;
+}
+
+#payouts{
+	position:absolute;
+	left:600px;
+	width:30%;
 }
 
 #price{
 	font-size:64px;	
 }
 
-#totalWallet{
+#poolHash{
 	position:absolute;
-	left:875px;
-	top:200px;
-	min-width: 250px;
+	top:90px;
+	margin-top:5px;
+	margin-bottom:15px;
+	margin-left:10px;
+}
+
+#statsInfo{
+	position: absolute;
+	left: 800px;
+	width:30%;
+}
+
+#wallet{
+	color:#BA9F33;
+	//color:#00B221;
+	position:absolute;
+	left:600px;
+	top:475px;
 }
